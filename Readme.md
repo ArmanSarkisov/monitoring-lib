@@ -3,7 +3,6 @@
 ### add this in your html
 <pre>
     <script defer src="lib.js"></script>
-    <script defer src="lib.js"></script>
     <script defer src="yourscript.js"></script>
 </pre>
    
