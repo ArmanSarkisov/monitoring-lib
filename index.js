@@ -279,7 +279,4 @@ class MetaTags extends Monitoring {
 
 window.Monitoring = Monitoring;
 
-//** how to use
-const monitoring = new Monitoring('1223334444');
 
-monitoring.use('1223334444');
