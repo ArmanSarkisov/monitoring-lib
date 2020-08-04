@@ -18,12 +18,12 @@ class Monitoring {
         this.apiKey = apiKey;
     }
 
-    use(key) {
-        if (key && this.apiKey) {
-            new ObservePerformance(key).observe();
-            new EvilMethodsCheck(key).checkUsingEval();
-            new EvilMethodsCheck(key).checkUsingDocumentWrite();
-            new MetaTags(key).checkMetaTags();
+    use() {
+        if (this.apiKey) {
+            new ObservePerformance(this.apiKey).observe();
+            new EvilMethodsCheck(this.apiKey).checkUsingEval();
+            new EvilMethodsCheck(this.apiKey).checkUsingDocumentWrite();
+            new MetaTags(this.apiKey).checkMetaTags();
         }
     }
 }
@@ -164,7 +164,6 @@ class DataAnalytics extends Monitoring {
 
                 data.isCached = item.transferSize === 0;
                 data.isMinified = (item.name.includes('.css') || item.name.includes('.js')) ? item.name.includes('.min') : null;
-                delete data.isMinified;
 
                 return data;
             } else if (item.initiatorType === 'navigation') {
@@ -241,7 +240,7 @@ class MetaTags extends Monitoring {
                 date: Date.now(),
                 message: 'Your title is too long',
                 type: 'title',
-                details: 'see more at: https://developer.mozilla.org/ru/docs/Web/HTML/Element/title',
+                details: 'The title should not have more than 50 characters',
             }]);
         }
 
@@ -249,7 +248,7 @@ class MetaTags extends Monitoring {
             Request.postRequest('info', [{
                 appId: this.apiKey,
                 date: Date.now(),
-                message: `You are using ${ badMetaTagsName.join(',') } bad meta tags`,
+                message: `Unnecessary meta tags - ${ badMetaTagsName.join(', ') } `,
                 type: 'badMeta',
                 details: 'see more at: https://metatags.io/',
             }]);
@@ -259,7 +258,7 @@ class MetaTags extends Monitoring {
             Request.postRequest('info', [{
                 appId: this.apiKey,
                 date: Date.now(),
-                message: `You have to use ${goodMetaTagsName.join(",")} meta tags`,
+                message: `Use ${goodMetaTagsName.join(", ")} meta tags for better SEO results`,
                 type: 'goodMeta',
                 details: 'see more at: https://metatags.io/',
             }]);
