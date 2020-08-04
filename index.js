@@ -19,8 +19,8 @@ class Monitoring {
     }
 
     use(key) {
-        if (this.apiKey) {
-            ObservePerformance.observe();
+        if (key && this.apiKey) {
+            new ObservePerformance(key).observe();
             new EvilMethodsCheck(key).checkUsingEval();
             new EvilMethodsCheck(key).checkUsingDocumentWrite();
             new MetaTags(key).checkMetaTags();
@@ -30,10 +30,6 @@ class Monitoring {
 
 // not recommended methods
 class EvilMethodsCheck extends Monitoring {
-
-    constructor(apiKey) {
-        super(apiKey);
-    }
 
     checkUsingDocumentWrite() {
         if (document) {
@@ -74,24 +70,27 @@ class EvilMethodsCheck extends Monitoring {
 
 class Request {
     static postRequest(endpoint, data) {
-        if ((data && data.length) || data) {
-            requestIdleCallback(() => {
-                fetch(`https://web-monitoring-cba12.firebaseio.com/${ endpoint }.json`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(...data),
+        if (data) {
+            data.forEach(item => {
+                requestIdleCallback(() => {
+                    fetch(`https://web-monitoring-cba12.firebaseio.com/${ endpoint }.json`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(item),
+                    });
                 });
             });
         }
     }
 }
 
-class ObservePerformance {
-    static performanceObserveInstance() {
+class ObservePerformance extends Monitoring {
+
+    performanceObserveInstance() {
         return new PerformanceObserver((list) => {
-            const resources = ObservePerformance.dataProcessing(list.getEntries()
+            const resources = this.dataProcessing(list.getEntries()
                 .filter(item => item instanceof PerformanceResourceTiming));
 
             resources.then(data => {
@@ -100,13 +99,13 @@ class ObservePerformance {
         });
     }
 
-    static dataProcessing(data) {
+    dataProcessing(data) {
         const TIMING = 15000;
 
         return new Promise((resolve, reject) => {
             if (data) {
                 setTimeout(() => {
-                    resolve(new DataAnalytics('1223334444').mutateObjects(data));
+                    resolve(new DataAnalytics(this.apiKey).mutateObjects(data));
                 }, TIMING);
             } else {
                 reject('something went to wrong');
@@ -114,8 +113,8 @@ class ObservePerformance {
         });
     }
 
-    static observe() {
-        const po = ObservePerformance.performanceObserveInstance();
+    observe() {
+        const po = this.performanceObserveInstance();
 
         po.observe({ type: 'resource', buffered: true });
         po.observe({ type: 'navigation', buffered: true });
@@ -133,10 +132,6 @@ class ObservePerformance {
 
 
 class DataAnalytics extends Monitoring {
-
-    constructor(apiKey) {
-        super(apiKey);
-    }
 
     eachData(item) {
         return {
@@ -201,9 +196,6 @@ class DataAnalytics extends Monitoring {
 }
 
 class MetaTags extends Monitoring {
-    constructor(apiKey) {
-        super(apiKey);
-    }
 
     checkMetaTags() {
         const meta = [...document.querySelectorAll('meta')];
@@ -278,5 +270,3 @@ class MetaTags extends Monitoring {
 
 
 window.Monitoring = Monitoring;
-
-
