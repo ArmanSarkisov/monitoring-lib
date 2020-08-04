@@ -1,13 +1,10 @@
 ## how to use
 
-### add this in your html
+### Copy and paste the script into the bottom of your <body> tag, but before you use any monitoring services:
 <pre>
-<script defer src="lib.js"></script>
-<script defer src="yourscript.js"></script>
-</pre>
-   
-### add this two lines into your code
-<pre>
-const monitoring = new Monitoring(yourAppId);
-monitoring.use(yourAppId);
+<script defer src="monitoring.js"></script>
+<script>
+  const monitoring = new Monitoring(yourAppId);
+  monitoring.use(yourAppId);
+</script>
 </pre>
